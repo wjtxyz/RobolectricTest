@@ -1,16 +1,9 @@
 package com.xxx.robolectrictest;
 
 import android.annotation.SuppressLint;
-import android.content.ComponentName;
 import android.content.Intent;
-import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.CountDownTimer;
-import android.os.Handler;
-import android.os.IBinder;
-import android.os.Message;
-import android.os.Messenger;
-import android.os.RemoteException;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,23 +18,14 @@ import androidx.fragment.app.DialogFragment;
 @SuppressLint("HandlerLeak")
 public class MainActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Log.d(TAG, "onCreate: ");
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        findViewById(R.id.tv1).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(MainActivity.this, SecondActivity.class));
-            }
-        });
-        findViewById(R.id.tv2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                new CountDownDialogFragment().show(getSupportFragmentManager(), null);
-            }
-        });
+        findViewById(R.id.tv1).setOnClickListener(v -> startActivity(new Intent(MainActivity.this, SecondActivity.class)));
+        findViewById(R.id.tv2).setOnClickListener(v -> new CountDownDialogFragment().show(getSupportFragmentManager(), null));
     }
 
     @Override
