@@ -14,7 +14,8 @@
             android:name=".BindServiceActivity"
             android:exported="true" />
         <activity android:name=".SecondActivity" />
-        <activity android:name=".MainActivity">
+        <activity
+            android:name=".MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

@@ -19,7 +19,6 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
-import org.robolectric.Shadows;
 import org.robolectric.android.controller.ActivityController;
 import org.robolectric.annotation.Config;
 import org.robolectric.shadows.ShadowApplication;
@@ -29,10 +28,15 @@ import java.util.concurrent.TimeUnit;
 
 import static androidx.test.espresso.Espresso.onView;
 import static androidx.test.espresso.action.ViewActions.click;
+import static androidx.test.espresso.action.ViewActions.replaceText;
+import static androidx.test.espresso.assertion.ViewAssertions.matches;
+import static androidx.test.espresso.matcher.RootMatchers.isDialog;
 import static androidx.test.espresso.matcher.ViewMatchers.withId;
+import static androidx.test.espresso.matcher.ViewMatchers.withText;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.robolectric.Shadows.shadowOf;
 
 
 @RunWith(RobolectricTestRunner.class)
@@ -45,7 +49,7 @@ public class MainActivityTest {
             activityScenario.onActivity(activity -> {
                 onView(withId(R.id.tv1)).perform(click());
                 assertEquals(new ComponentName(activity, SecondActivity.class.getName()),
-                        Shadows.shadowOf(activity)
+                        shadowOf(activity)
                                 .getNextStartedActivity().getComponent());
             });
         }
@@ -109,7 +113,7 @@ public class MainActivityTest {
                 super.handleMessage(msg);
             }
         };
-        ShadowApplication shadowApplication = Shadows.shadowOf(ApplicationProvider.<Application>getApplicationContext());
+        ShadowApplication shadowApplication = shadowOf(ApplicationProvider.<Application>getApplicationContext());
         //build Activity for current test on air
         Robolectric.buildActivity(FragmentActivity.class);
 
@@ -146,4 +150,21 @@ public class MainActivityTest {
         mainActivityActivityController.configurationChange();
     }
 
+
+    @Test
+    public void testEditMapNameDialogFragment() {
+        ActivityController<FragmentActivity> activityController
+                = Robolectric.buildActivity(FragmentActivity.class).create().start().resume();
+        new MainActivity.EditMapNameDialogFragment()
+                .showNow(activityController.get().getSupportFragmentManager(), "test");
+
+        onView(withId(R.id.tv1)).inRoot(isDialog())
+                .perform(replaceText("12你我abc_")).check(matches(withText("12你我abc_")));
+        onView(withId(R.id.tv1)).inRoot(isDialog())
+                .perform(replaceText("12#$你我にほ")).check(matches(withText("12你我")));
+        onView(withId(R.id.tv1)).inRoot(isDialog())
+                .perform(replaceText("12345678901234")).check(matches(withText("1234567890")));
+
+        activityController.pause().stop().destroy();
+    }
 }
